@@ -4,6 +4,7 @@
 A class Square that defines a square with size validation
 """
 
+
 class Square:
     """Class Square that defines a square"""
 
