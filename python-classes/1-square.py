@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 """"
 1. Square with size
-A class Sqaure that defines a sqaure
+A class Square that defines a Square
 """
 
 
