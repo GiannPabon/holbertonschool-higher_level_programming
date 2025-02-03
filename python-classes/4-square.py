@@ -4,6 +4,7 @@
 A class Square that defines a square with getter and setter for size
 """
 
+
 class Square:
     """Class Square that defines a square"""
 
