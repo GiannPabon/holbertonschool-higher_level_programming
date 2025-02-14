@@ -3,6 +3,7 @@
 Module that offers a function to append text to a file in UTF-8 format.
 """
 
+
 def append_write(filename="", text=""):
     """
     Appends the specified string to a text file using UTF-8 encoding
