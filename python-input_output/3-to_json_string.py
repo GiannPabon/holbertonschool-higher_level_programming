@@ -6,6 +6,7 @@ string representation.
 
 import json
 
+
 def to_json_string(my_obj):
     """
     Generates the JSON string representation of the given Python object.
