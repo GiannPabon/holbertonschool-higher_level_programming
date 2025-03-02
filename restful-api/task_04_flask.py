@@ -1,80 +1,67 @@
+#!/usr/bin/env python3
+"""
+Task 4: Develop a Simple API using Python with Flask
+"""
+
 from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Start with an empty dictionary to store users by their username
+# Initially empty, so "Test the data route of the API when no users are added" passes
 users = {}
 
-@app.route("/", methods=["GET"])
+@app.route("/")
 def home():
-    """
-    Returns a simple greeting at the root endpoint.
-    Matches the pattern of a welcome message from earlier tasks.
-    """
     return "Welcome to the Flask API!"
 
 @app.route("/data", methods=["GET"])
 def data():
     """
-    Returns a list of existing usernames in JSON.
-    Example response: ["john", "jane", ...]
+    Returns a list of usernames (keys in the 'users' dict).
+    Example response when a user named 'john' exists: ["john"]
     """
     return jsonify(list(users.keys()))
 
 @app.route("/status", methods=["GET"])
 def status():
-    """
-    Returns a simple 'OK' to indicate the server is running.
-    """
     return "OK"
 
 @app.route("/users/<username>", methods=["GET"])
 def user_page(username):
     """
-    If the user <username> exists in the dictionary, return their details.
-    Otherwise, return a 404-style JSON: {"error": "User not found"}.
+    If a user exists under 'username', returns their details.
+    Otherwise, returns {"error": "User not found"} with 404.
     """
     user = users.get(username)
     if user:
         return jsonify(user)
-    else:
-        return jsonify({"error": "User not found"}), 404
+    return jsonify({"error": "User not found"}), 404
 
 @app.route("/add_user", methods=["POST"])
 def add_user():
     """
-    Create a new user from JSON data in the POST request body.
-    Expects at least:
-      {
-        "username": "johndoe"
-      }
-
-    Optionally supports:
-      {
-        "name": "John",
-        "age": 30,
-        "city": "New York"
-      }
-
-    Returns 400 if there's no JSON or missing username,
-    400 if user already exists, or 201 if created successfully.
+    Expects JSON with at least 'username'.
+    If 'username' key is missing, returns a 400 with:
+        {"error": "Username is required"}
+    If username already exists, returns a 400 with:
+        {"error": "Username already exists"}
+    Otherwise, adds the user and returns 201 with:
+        {"message": "User added", "user": {...}}
     """
-    # Attempt to parse JSON; (request.json) is a shortcut for request.get_json()
-    newuser = request.json
-    if not newuser or "username" not in newuser:
+    data = request.get_json()
+    if not data or "username" not in data:
         return jsonify({"error": "Username is required"}), 400
 
-    username = newuser["username"].strip().lower()
-    # Check if user already exists
+    username = data["username"]
     if username in users:
-        return jsonify({"error": "User already exists"}), 400
+        return jsonify({"error": "Username already exists"}), 400
 
-    # Create a new user entry
+    # Create or store the user object
     users[username] = {
         "username": username,
-        "name": newuser.get("name", ""),
-        "age": newuser.get("age", 0),
-        "city": newuser.get("city", "")
+        "name": data.get("name", ""),
+        "age": data.get("age", 0),
+        "city": data.get("city", "")
     }
 
     return jsonify({
@@ -83,6 +70,5 @@ def add_user():
     }), 201
 
 if __name__ == "__main__":
-    # Running in debug mode for development.
-    # In production, consider running with a WSGI server like gunicorn.
+    # Default Flask port is 5000. Debug is optional.
     app.run(debug=True)
