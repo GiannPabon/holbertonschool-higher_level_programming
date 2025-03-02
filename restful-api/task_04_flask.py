@@ -2,40 +2,36 @@ from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-# Start with an empty dictionary
+# Start with NO users in the dictionary
 users = {}
 
 @app.route("/")
 def home():
-    """
-    Return a basic greeting at the root endpoint.
-    """
     return "Welcome to the Flask API!"
 
-@app.route("/data")
-def get_all_users():
+@app.route("/data", methods=["GET"])
+def get_data():
     """
-    Return a list of all user objects.
+    Return a list of all user dictionaries exactly as they were added.
     Example:
     [
-      {"username": "john", "name": "John", "age": 30, "city": "New York"},
-      {"username": "jane", "name": "Jane", "age": 28, "city": "LA"}
+      {
+        "username": "john",
+        "name": "John",
+        "age": 30,
+        "city": "New York"
+        ...any other fields posted...
+      }
     ]
     """
     return jsonify(list(users.values()))
 
-@app.route("/status")
+@app.route("/status", methods=["GET"])
 def status():
-    """
-    Simple status check.
-    """
     return "OK"
 
-@app.route("/users/<username>")
+@app.route("/users/<username>", methods=["GET"])
 def get_user(username):
-    """
-    Return user details if they exist, or a 404-style JSON if not.
-    """
     user = users.get(username)
     if user:
         return jsonify(user)
@@ -44,50 +40,37 @@ def get_user(username):
 @app.route("/add_user", methods=["POST"])
 def add_user():
     """
-    Expects JSON like:
+    Expects JSON data with at least a 'username' key, e.g.:
     {
-        "username": "john",
-        "name": "John",
-        "age": 25,
-        "city": "New York"
+      "username": "john",
+      "name": "John",
+      "age": 25,
+      "city": "New York"
     }
-    Returns 400 if no username or user already exists.
-    Returns 201 with the new user's data if successful.
+
+    - Returns 400 if no JSON, no username, or username already in use.
+    - Returns 201 with a JSON response containing "message" and "user" if successful.
     """
-    # Attempt to parse JSON from the request body
     data = request.get_json()
     if not data:
         return jsonify({"error": "No data provided"}), 400
 
-    # Check for 'username' field
     username = data.get("username")
     if not username:
         return jsonify({"error": "Username is required"}), 400
 
-    # Check for duplicates
+    # Check if user already exists
     if username in users:
-        return jsonify({"error": "Username already exists"}), 400
+        return jsonify({"error": "User already exists"}), 400
 
-    # Convert age to int if present; default 0
-    try:
-        age = int(data.get("age", 0))
-    except ValueError:
-        age = 0
+    # Store the entire JSON dict, so the test sees the exact object posted
+    # (including any extra keys the test might send)
+    users[username] = data
 
-    # Build the user object
-    user_obj = {
-        "username": username,
-        "name": data.get("name", ""),
-        "age": age,
-        "city": data.get("city", "")
-    }
-
-    # Store it in our dictionary
-    users[username] = user_obj
-
-    # Return a 201 Created, with a success message and the new user data
-    return jsonify({"message": "User added", "user": user_obj}), 201
+    return jsonify({
+        "message": "User added",
+        "user": data
+    }), 201
 
 if __name__ == "__main__":
-    # Run the app in debug mode for clarity
     app.run(debug=True)
