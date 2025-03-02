@@ -9,28 +9,24 @@ users = {}
 def home():
     return "Welcome to the Flask API!"
 
-@app.route("/data")
+@app.route("/data", methods=["GET"])
 def data():
     """
-    Return a list of *all user objects*, not just the keys.
-    Example:
+    Return a list of user objects, e.g.:
     [
-      {
-        "username": "john",
-        "name": "John",
-        "age": 30,
-        "city": "New York"
-      }
+      {"username": "john", "name": "John", "age": 30, "city": "New York"},
+      ...
     ]
     """
+    # Convert the users dict values into a list of dicts
     all_users = list(users.values())
     return jsonify(all_users)
 
-@app.route("/status")
+@app.route("/status", methods=["GET"])
 def status():
     return "OK"
 
-@app.route("/users/<username>")
+@app.route("/users/<username>", methods=["GET"])
 def user_page(username):
     user = users.get(username)
     if user:
@@ -41,35 +37,34 @@ def user_page(username):
 @app.route("/add_user", methods=["POST"])
 def add_user():
     """
-    Expects JSON with at least a 'username' field, e.g.:
+    Expects JSON with at least 'username', e.g.:
     {
-        "username": "alice",
-        "name": "Alice",
-        "age": 25,
-        "city": "San Francisco"
+      "username": "john",
+      "name": "John",
+      "age": 25,
+      "city": "New York"
     }
     """
-    # Attempt to parse JSON
     newuser = request.get_json(silent=True)
     if not newuser:
         return jsonify({"error": "No data provided"}), 400
 
-    # Check if 'username' is present
     if "username" not in newuser:
         return jsonify({"error": "Username is required"}), 400
 
     username = newuser["username"]
-    # Check if user already exists
-    if username in users:
-        return jsonify({"error": "User already exists"}), 400
 
-    # Convert 'age' to int (if present), else default to 0
+    # If this username is already in the dict, return a 400 with a specific message
+    if username in users:
+        return jsonify({"error": "Username already exists"}), 400
+
+    # Convert 'age' to int if provided
     try:
         age = int(newuser.get("age", 0))
     except ValueError:
         age = 0
 
-    # Create the user dictionary
+    # Create the user object
     users[username] = {
         "username": username,
         "name": newuser.get("name", ""),
