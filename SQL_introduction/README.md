@@ -1,4 +1,3 @@
-```markdown
 # SQL - Introduction
 
 This project introduces fundamental concepts of SQL (Structured Query Language) and MySQL, a relational database management system. It covers basic database operations, including creating databases and tables, inserting, updating, and deleting data, and querying data using various SQL statements.
