@@ -4,13 +4,6 @@
 
 This project focuses on connecting Python with MySQL databases using two different approaches: direct SQL queries with the `MySQLdb` module and Object-Relational Mapping (ORM) with the `SQLAlchemy` module. The goal is to understand how to interact with databases in Python and to appreciate the advantages of using an ORM.
 
-## Curriculum
-
-- **Course**: [C#25] Foundations v2 - Part 2
-- **Average Score**: 78.77%
-- **Project Badge**: 0%
-- **Level**: Amateur
-- **Author**: Guillaume
 
 ## Background Context
 
