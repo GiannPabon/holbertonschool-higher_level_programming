@@ -1,4 +1,4 @@
-SQL - More queries
+## SQL - More queries
 
 This project focuses on advanced SQL queries and database management in MySQL. It covers creating users, managing privileges, working with constraints, and retrieving data from multiple tables using joins and subqueries.
 
